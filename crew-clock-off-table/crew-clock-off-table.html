@@ -1,0 +1,77 @@
+<!-- Crew clock on clock off table -->
+<ng-template #crewClock>
+  <div class="mb-1">
+    <h3>Crew clock on clock off</h3>
+  </div>
+ 
+  <p-table [value]="timeEntryValues" [(selection)]="selectedTimeEntries" styleClass="ui-table-crew">
+    <ng-template pTemplate="caption">
+      <button
+        type="button"
+        class="btn btn-light d-flex"
+        (click)="onBulkEdit()"
+        [disabled]="!selectedTimeEntries || selectedTimeEntries.length <= 0"
+      >
+        + Bulk edit
+      </button>
+    </ng-template>
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th>
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="name">Crew members (DELWP/ PV) <p-sortIcon field="name"></p-sortIcon></th>
+        <th width="25%" pSortableColumn="taskNumber">Task<p-sortIcon field="taskNumber"></p-sortIcon></th>
+        <th width="25%" pSortableColumn="timeTrackedDays">Time tracked (days)<p-sortIcon field="timeTrackedDays"></p-sortIcon></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-timeEntry>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="timeEntry"></p-tableCheckbox>
+        </td>
+        <td>
+          <span class="ui-column-title">Crew members (DELWP/ PV)</span>
+          <p-dropdown
+            [options]="crewMemberDropDownList"
+            optionLabel="name"
+            placeholder="Select"
+            [(ngModel)]="timeEntry.crewMember"
+            [style]="{ width: '100%' }"
+          ></p-dropdown>
+        </td>
+        <td class="pt-0 pb-0">
+          <div class="ui-column-chkbox-mobile p-1"></div>
+          <span class="ui-column-title">Task</span>
+          <!-- TODO: Adjust p-dropdown width for responsive on tablet -->
+          <p-dropdown
+            [options]="jobTasks$ | async"
+            optionLabel="title"
+            placeholder="Select"
+            [(ngModel)]="timeEntry.task"
+            [style]="{ width: '100%' }"
+          ></p-dropdown>
+        </td>
+        <td>
+          <div class="ui-column-chkbox-mobile p-1"></div>
+          <span class="ui-column-title">Time tracked (days)</span>
+          <p-dropdown
+            [options]="timeTrackedDayOptions"
+            [(ngModel)]="timeEntry.time"
+            [style]="{ width: '100%' }"
+            placeholder="Select"
+          ></p-dropdown>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <button type="button" class="btn btn-light mt-2 text-nowrap" (click)="onAddAnotherEntry()">+ Add another entry</button>
+  <button
+    type="button"
+    class="btn mt-2 ml-2 text-nowrap delete-btn"
+    (click)="onDeleteEntry()"
+    [disabled]="!selectedTimeEntries || selectedTimeEntries.length <= 0"
+  >
+    <fa-icon [icon]="['fas', 'trash-alt']" class="pr-1"></fa-icon>Delete entry
+  </button>
+</ng-template>
