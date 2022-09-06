@@ -1,9 +1,45 @@
+<div class="content-section pb-0">
+  <div class="container">
+    <app-breadcrumbs [breadcrumbs]="breadcrumbs" activeTitle="Edit Post Job Safety Review"></app-breadcrumbs>
+    <div class="row">
+      <div class="col-12 header-flex mb-2">
+        <h1 class="header">Edit Post Job Safety Review</h1>
+      </div>
+    </div>
+  </div>
+  <div class="container tk-small">
+    <div class="row">
+      <div class="col-12">
+        <form [formGroup]="form">
+          <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form"></formly-form>
+        </form>
+        <ng-content *ngTemplateOutlet="crewClock"></ng-content>
+        <form [formGroup]="form">
+          <formly-form [model]="model" [fields]="fieldsSignOff" [options]="options" [form]="form"></formly-form>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="container tk-small">
+    <div class="row mb-2 mt-2">
+      <div class="col-12">
+        <hr class="" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <ng-content *ngTemplateOutlet="footerContent"></ng-content>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Crew clock on clock off table -->
 <ng-template #crewClock>
   <div class="mb-1">
     <h3>Crew clock on clock off</h3>
   </div>
- 
   <p-table [value]="timeEntryValues" [(selection)]="selectedTimeEntries" styleClass="ui-table-crew">
     <ng-template pTemplate="caption">
       <button
@@ -43,7 +79,6 @@
         <td class="pt-0 pb-0">
           <div class="ui-column-chkbox-mobile p-1"></div>
           <span class="ui-column-title">Task</span>
-          <!-- TODO: Adjust p-dropdown width for responsive on tablet -->
           <p-dropdown
             [options]="jobTasks$ | async"
             optionLabel="title"
@@ -57,10 +92,12 @@
           <span class="ui-column-title">Time tracked (days)</span>
           <p-dropdown
             [options]="timeTrackedDayOptions"
-            [(ngModel)]="timeEntry.time"
+            optionLabel="label"
             [style]="{ width: '100%' }"
             placeholder="Select"
-          ></p-dropdown>
+            [(ngModel)]="timeEntry.time"
+          >
+          </p-dropdown>
         </td>
       </tr>
     </ng-template>
@@ -75,3 +112,48 @@
     <fa-icon [icon]="['fas', 'trash-alt']" class="pr-1"></fa-icon>Delete entry
   </button>
 </ng-template>
+
+<ng-template #footerContent>
+  <div class="button-panel text-right mb-2">
+    <button class="btn btn-light" (click)="onCancel()">Cancel</button>
+    <div class="btn-space"></div>
+    <button type="button" class="btn btn-primary" [disabled]="!this.form.valid || !canEditPostJobSafetyReviewChecklist" (click)="onSave()">
+      Save
+    </button>
+  </div>
+</ng-template>
+
+<!-- Bulk edit modal -->
+<component-library-generic-modal-popup [showModal]="showBulkEditModal" (modalClose$)="onCloseModal()" [options]="modalOptions">
+  <h3 header class="modal-title">Bulk edit crew clock off</h3>
+  <div body>
+    <form [formGroup]="bulkEditForm">
+      <div class="form-group">
+        <label>Task</label>
+        <p-dropdown
+          [options]="jobTasks$ | async"
+          optionLabel="title"
+          [style]="{ width: '100%' }"
+          placeholder="Select"
+          formControlName="taskDropDown"
+        ></p-dropdown>
+        <label class="pt-2">Time tracked (days) to</label>
+        <p-dropdown
+          [options]="timeTrackedDayOptions"
+          optionLabel="label"
+          [style]="{ width: '100%' }"
+          placeholder="Select"
+          formControlName="timeTrackDays"
+        >
+        </p-dropdown>
+      </div>
+    </form>
+  </div>
+  <div footer>
+    <div class="button-panel text-right">
+      <button class="btn btn-light" (click)="onCloseModal()">Cancel</button>
+      <div class="btn-space"></div>
+      <button class="btn btn-primary" [disabled]="!bulkEditForm?.valid" ngbAutofocus (click)="onSaveModal()">Save</button>
+    </div>
+  </div>
+</component-library-generic-modal-popup>
